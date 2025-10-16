@@ -11,10 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TP_simulacro">
+
+        <!-- Activities para el Todo List -->
         <activity
-            android:name=".MainActivity"
+            android:name=".MainTodoActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:label="Mis Tareas"
             android:theme="@style/Theme.TP_simulacro">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,11 +25,10 @@
             </intent-filter>
         </activity>
 
-        <!-- Activities para el Todo List -->
         <activity
-            android:name=".MainTodoActivity"
+            android:name=".MainActivity"
             android:exported="false"
-            android:label="Lista de Tareas"
+            android:label="@string/app_name"
             android:theme="@style/Theme.TP_simulacro" />
 
         <activity
