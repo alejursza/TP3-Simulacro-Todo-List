@@ -5,10 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -24,8 +24,11 @@ import ort.argentina.yatay.tp3.tp_simulacro.components.TaskComponent
 import ort.argentina.yatay.tp3.tp_simulacro.models.Task
 import ort.argentina.yatay.tp3.tp_simulacro.models.TaskStatus
 import ort.argentina.yatay.tp3.tp_simulacro.ui.theme.TP_simulacroTheme
+import ort.argentina.yatay.tp3.tp_simulacro.viewmodel.TaskViewModel
 
 class MainTodoActivity : ComponentActivity() {
+    private val viewModel: TaskViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -41,7 +44,8 @@ class MainTodoActivity : ComponentActivity() {
                     }
                 ) { innerPadding ->
                     MainTodoScreen(
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        viewModel = viewModel
                     )
                 }
             }
@@ -50,26 +54,13 @@ class MainTodoActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainTodoScreen(modifier: Modifier = Modifier) {
-    // Listas de tareas (por ahora con datos de ejemplo)
-    var listToDoTasks by remember {
-        mutableStateOf(
-            listOf(
-                Task(1, "Hacer la compra semanal", "", TaskStatus.TODO),
-                Task(2, "Revisar el informe del proyecto", "", TaskStatus.TODO),
-                Task(3, "Llamar al fontanero", "", TaskStatus.TODO)
-            )
-        )
-    }
-
-    var listFinishedTasks by remember {
-        mutableStateOf(
-            listOf(
-                Task(4, "Enviar la presentación de marketing", "", TaskStatus.FINISHED),
-                Task(5, "Reservar cita con el dentista", "", TaskStatus.FINISHED)
-            )
-        )
-    }
+fun MainTodoScreen(
+    modifier: Modifier = Modifier,
+    viewModel: TaskViewModel? = null
+) {
+    // Observar las listas de tareas desde el ViewModel
+    val listToDoTasks by viewModel?.todoTasks?.collectAsState() ?: remember { mutableStateOf(emptyList()) }
+    val listFinishedTasks by viewModel?.finishedTasks?.collectAsState() ?: remember { mutableStateOf(emptyList()) }
 
     // Estado para controlar si la sección de completadas está expandida
     var isCompletedExpanded by remember { mutableStateOf(false) }
@@ -109,13 +100,13 @@ fun MainTodoScreen(modifier: Modifier = Modifier) {
                 TaskComponent(
                     task = task,
                     onEdit = {
-                        // TODO: Navegar a EditTaskActivity
+                        // TODO: Navegar a EditTaskActivity con el ID de la tarea
                     },
                     onRemove = {
-                        // TODO: Eliminar tarea
+                        viewModel?.markTaskAsRemoved(task.id)
                     },
                     onComplete = {
-                        // TODO: Marcar como completada
+                        viewModel?.markTaskAsFinished(task.id)
                     }
                 )
                 // Agregar divisor entre tareas (excepto después de la última)
@@ -197,10 +188,10 @@ fun MainTodoScreen(modifier: Modifier = Modifier) {
                             TaskComponent(
                                 task = task,
                                 onEdit = {
-                                    // TODO: Navegar a EditTaskActivity
+                                    // TODO: Navegar a EditTaskActivity con el ID de la tarea
                                 },
                                 onRemove = {
-                                    // TODO: Eliminar tarea
+                                    viewModel?.markTaskAsRemoved(task.id)
                                 }
                             )
                             // Agregar divisor entre tareas (excepto después de la última)
