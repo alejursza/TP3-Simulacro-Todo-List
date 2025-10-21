@@ -15,4 +15,3 @@ class Converters {
         return TaskStatus.valueOf(value)
     }
 }
-
